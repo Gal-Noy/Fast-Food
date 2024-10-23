@@ -21,7 +21,7 @@ const Header: React.FC<{ username: string; score: number }> = ({ username, score
           color: theme.palette.primary.main,
         }}
       >
-        {username ? username : "Catch The Star"}
+        {username ? username : "Fast Food"}
       </Typography>
       {username && (
         <Typography

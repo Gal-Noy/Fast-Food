@@ -68,7 +68,10 @@ const Game: React.FC<{
     };
   }, [indicatorMode, isWaiting]);
 
-  const StarArea = ({ matchingMode }: { matchingMode: IndicatorMode }) => {
+  const FoodArea = ({ matchingMode }: { matchingMode: IndicatorMode }) => {
+    const getRandomFood = () =>
+      ["donut", "french-fries", "hotdog", "ice-cream", "pizza", "kebab", "noodles"][Math.floor(Math.random() * 7)];
+
     return (
       <Box
         sx={{
@@ -89,7 +92,11 @@ const Game: React.FC<{
               transform: "translate(-50%, -50%)",
             }}
           >
-            <h1>⭐</h1>
+            <img
+              src={`${getRandomFood()}.png`}
+              alt="food"
+              style={{ height: "100px" }}
+            />
           </Box>
         )}
       </Box>
@@ -108,12 +115,12 @@ const Game: React.FC<{
           boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
           borderRadius: "20px",
           width: "100%",
-          height: "50vh",
+          height: "40vh",
         }}
       >
-        <StarArea matchingMode={IndicatorMode.Left} />
+        <FoodArea matchingMode={IndicatorMode.Left} />
         <Divider orientation="vertical" flexItem sx={{ borderWidth: "1.5px" }} />
-        <StarArea matchingMode={IndicatorMode.Right} />
+        <FoodArea matchingMode={IndicatorMode.Right} />
       </Stack>
       <Footer message={gameMessage} variant={gameMessage === "Success!" ? "success" : "error"} />
     </>

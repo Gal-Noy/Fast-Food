@@ -57,7 +57,7 @@ const Menu: React.FC<{
             fontWeight: "bold",
           }}
         >
-          USER:
+          NAME:
         </Typography>
         <TextField
           value={input}
@@ -84,7 +84,7 @@ const Menu: React.FC<{
           borderRadius: "10px",
         }}
       >
-        {isPending ? "LOADING..." : "ENTER"}
+        {isPending ? "LOADING..." : "START"}
       </Button>
     </Stack>
   );

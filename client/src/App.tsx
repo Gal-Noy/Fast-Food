@@ -30,8 +30,6 @@ function App() {
       <Stack
         sx={{
           alignItems: "center",
-          backgroundColor: "#f5f5f5",
-          height: "100vh",
         }}
       >
         <Stack
