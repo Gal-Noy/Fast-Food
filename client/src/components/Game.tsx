@@ -10,14 +10,21 @@ const Game: React.FC<{
   const [indicatorMode, setIndicatorMode] = useState<IndicatorMode>(IndicatorMode.Hidden);
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
 
+  const waitingTimeourRef = useRef<any | null>(null);
+  const indicatorTimeoutRef = useRef<any | null>(null);
+
   useEffect(() => {
     startNewRound();
   }, []);
 
   const clearPreviousTimeouts = () => {
-    const id = setTimeout(() => {}, 0);
-    for (let i = 0; i < id; i++) {
-      clearTimeout(i);
+    if (waitingTimeourRef.current) {
+      clearTimeout(waitingTimeourRef.current);
+      waitingTimeourRef.current = null;
+    }
+    if (indicatorTimeoutRef.current) {
+      clearTimeout(indicatorTimeoutRef.current);
+      indicatorTimeoutRef.current = null;
     }
   };
 
@@ -27,11 +34,11 @@ const Game: React.FC<{
     setIsWaiting(true);
     setIndicatorMode(IndicatorMode.Hidden);
 
-    setTimeout(() => {
+    waitingTimeourRef.current = setTimeout(() => {
       setIsWaiting(false);
       setIndicatorMode(Math.random() > 0.5 ? IndicatorMode.Left : IndicatorMode.Right);
 
-      setTimeout(() => {
+      indicatorTimeoutRef.current = setTimeout(() => {
         setIndicatorMode(IndicatorMode.Hidden);
         setGameMessage("Too Late");
         startNewRound();
@@ -61,6 +68,34 @@ const Game: React.FC<{
     };
   }, [indicatorMode, isWaiting]);
 
+  const StarArea = ({ matchingMode }: { matchingMode: IndicatorMode }) => {
+    return (
+      <Box
+        sx={{
+          height: "100%",
+          width: "45%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+        }}
+      >
+        {indicatorMode === matchingMode && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: `${Math.random() * 80 + 10}%`,
+              left: `${Math.random() * 80 + 10}%`,
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <h1>⭐</h1>
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
   return (
     <>
       <Stack
@@ -76,29 +111,9 @@ const Game: React.FC<{
           height: "50vh",
         }}
       >
-        <Box
-          sx={{
-            height: "100%",
-            width: "45%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {indicatorMode === IndicatorMode.Left && <h1>here</h1>}
-        </Box>
+        <StarArea matchingMode={IndicatorMode.Left} />
         <Divider orientation="vertical" flexItem sx={{ borderWidth: "1.5px" }} />
-        <Box
-          sx={{
-            height: "100%",
-            width: "45%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {indicatorMode === IndicatorMode.Right && <h1>here</h1>}
-        </Box>
+        <StarArea matchingMode={IndicatorMode.Right} />
       </Stack>
       <Footer message={gameMessage} variant={gameMessage === "Success!" ? "success" : "error"} />
     </>
