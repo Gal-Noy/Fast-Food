@@ -3,12 +3,23 @@ import getGender from "../services/genderizeIO.js";
 import getUserMockData from "../services/randomUserGenerator.js";
 
 const gameController = {
-  // POST /submit-result
-  submitResult: async (req, res) => {
+  // POST /submit-score
+  submitScore: async (req, res) => {
     const { username, success } = req.body;
 
+    // Validate request
     if (!username || !success) {
       return res.status(400).json({ message: "Invalid request" });
+    }
+
+    // Validate username
+    if (
+      typeof username !== "string" ||
+      username.length < 3 ||
+      username.length > 20 ||
+      !/^[a-zA-Z0-9]+$/.test(username)
+    ) {
+      return res.status(400).json({ message: "Invalid username" });
     }
 
     if (!gameData[username]) {
@@ -33,7 +44,7 @@ const gameController = {
     // Update user score
     gameData[username].score += success ? 1 : 0;
 
-    return res.status(200).json({ message: "Result submitted" });
+    return res.status(200).json({ message: `Score submitted for ${username}` });
   },
 
   // GET /leaderboard
