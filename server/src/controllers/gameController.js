@@ -3,27 +3,26 @@ import getGender from "../services/genderizeIO.js";
 import getUserMockData from "../services/randomUserGenerator.js";
 
 const gameController = {
-  // POST /submit-score
-  submitScore: async (req, res) => {
-    const { username, success } = req.body;
+  // POST /start-game
+  startGame: async (req, res) => {
+    const { username } = req.body;
 
     // Validate request
-    if (!username || !success) {
+    if (!username) {
       return res.status(400).json({ message: "Invalid request" });
     }
 
     // Validate username
-    if (
-      typeof username !== "string" ||
-      username.length < 3 ||
-      username.length > 20 ||
-      !/^[a-zA-Z0-9]+$/.test(username)
-    ) {
-      return res.status(400).json({ message: "Invalid username" });
+    if (username.length < 3 || username.length > 20) {
+      return res.status(400).json({ message: "Invalid username, must be between 3 and 20 characters" });
+    }
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      return res.status(400).json({ message: "Invalid username, must contain only letters and numbers" });
     }
 
+    // Check if user already exists, if not create new user
     if (!gameData[username]) {
-      gameData[username] = { score: 0, gender: "undetermined", data: {} };
+      gameData[username] = { username, score: 0, gender: "undetermined", data: {} };
 
       // Enrich user data
       try {
@@ -41,17 +40,29 @@ const gameController = {
       }
     }
 
-    // Update user score
-    gameData[username].score += success ? 1 : 0;
+    return res.status(201).json(gameData[username]);
+  },
 
-    return res.status(200).json({ message: `Score submitted for ${username}` });
+  // POST /inc-score
+  incScore: async (req, res) => {
+    const { username } = req.body;
+
+    // Validate request
+    if (!username) {
+      return res.status(400).json({ message: "Invalid request" });
+    }
+
+    // Increment user score
+    gameData[username].score++;
+
+    return res.status(200).json(gameData[username]);
   },
 
   // GET /leaderboard
   getLeaderboard: async (req, res) => {
-    const leaderboard = Object.entries(gameData)
-      .sort((a, b) => b[1].score - a[1].score)
-      .map(([username, { score }]) => ({ username, score }));
+    const leaderboard = Object.values(gameData)
+      .sort((a, b) => b.score - a.score)
+      .map((user) => ({ username: user.username, score: user.score }));
 
     return res.status(200).json(leaderboard);
   },
