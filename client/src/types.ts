@@ -18,7 +18,7 @@ export interface User {
   username: string;
   score: number;
   gender: string;
-  data: UserData;
+  data?: UserData;
 }
 
 export enum IndicatorMode {

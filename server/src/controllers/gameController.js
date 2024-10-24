@@ -11,8 +11,6 @@ const gameController = {
     if (!username) {
       return res.status(400).json({ message: "Invalid request" });
     }
-
-    // Validate username
     if (username.length < 3 || username.length > 20) {
       return res.status(400).json({ message: "Invalid username, must be between 3 and 20 characters" });
     }
@@ -20,24 +18,25 @@ const gameController = {
       return res.status(400).json({ message: "Invalid username, must contain only letters and numbers" });
     }
 
-    // Check if user already exists, if not create new user
-    if (!gameData[username]) {
-      gameData[username] = { username, score: 0, gender: "undetermined", data: {} };
+    // User already exists
+    if (gameData[username]) {
+      return res.status(200).json(gameData[username]);
+    }
 
-      // Enrich user data
-      try {
-        // Get gender
-        const gender = await getGender(username);
-        gameData[username].gender = gender;
+    // Create new user
+    gameData[username] = { username, score: 0, gender: "undetermined", data: {} };
 
-        if (gender !== "undetermined") {
-          // Get data by gender
-          const userData = await getUserMockData(gender);
-          gameData[username].data = userData;
-        }
-      } catch (error) {
-        return res.status(500).json({ message: "Failed to enrich user data" });
+    // Enrich user
+    try {
+      const gender = await getGender(username);
+      gameData[username].gender = gender;
+
+      if (gender !== "undetermined") {
+        const userData = await getUserMockData(gender);
+        gameData[username].data = userData;
       }
+    } catch (error) {
+      return res.status(500).json({ message: "Failed to enrich user data" });
     }
 
     return res.status(201).json(gameData[username]);
